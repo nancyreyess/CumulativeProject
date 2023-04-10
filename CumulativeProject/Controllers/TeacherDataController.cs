@@ -23,7 +23,8 @@ namespace CumulativeProject.Controllers
         /// </returns>
 
         [HttpGet]
-        public IEnumerable<Teacher> ListTeachers()
+        [Route("api/TeacherData/ListTeachers/{SearchKey?}")]
+        public IEnumerable<Teacher> ListTeachers(string SearchKey=null)
         {
             //Create an instance of a connection
             MySqlConnection Conn = School.AccessDatabase();
@@ -35,7 +36,9 @@ namespace CumulativeProject.Controllers
             MySqlCommand cmd = Conn.CreateCommand();
 
             //SQL QUERY
-            cmd.CommandText = "Select * from Teachers";
+            cmd.CommandText = "Select * from Teachers where lower(teacherfname) like lower('%"+SearchKey+
+              "%') or lower(teacherlname) like lower('%"+SearchKey+
+              "%') or lower(concat(teacherfname, ' ', teacherlname)) like ('%"+SearchKey+"%')";
 
             //Gather Result Set of Query into a variable
             MySqlDataReader ResultSet = cmd.ExecuteReader();
