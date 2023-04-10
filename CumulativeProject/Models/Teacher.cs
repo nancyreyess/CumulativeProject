@@ -7,7 +7,7 @@ namespace CumulativeProject.Models
 {
     public class Teacher
     {
-        //The following properties define a Teacher
+        //The following are properties of a Teacher
         public int TeacherId;
         public string TeacherFname;
         public string TeacherLname;

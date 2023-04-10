@@ -60,7 +60,7 @@ namespace CumulativeProject.Controllers
                 NewTeacher.Salary = Salary; 
                 NewTeacher.EmployeeNumber = EmployeeNumber; 
                 
-                //Add the Author Name to the List
+                //Add the Teacher Name to the List
                 Teachers.Add(NewTeacher);
             }
 
