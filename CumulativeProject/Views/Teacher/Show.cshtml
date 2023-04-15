@@ -4,14 +4,13 @@
     ViewBag.Title = "Show";
 }
 
-<h2>Show</h2>
-
-<p>This page should show the teacher's information</p>
-
-<div> Name: @Model.TeacherFname @Model.TeacherLname </div>
-<div> Employee Number: @Model.EmployeeNumber </div>
-<div> Salary: @Model.Salary </div>
-
-
-
-
+<div id="containershow">
+    <nav>
+        <a class="navlink" href="/Teacher/List">Back To Teachers</a>
+        <a class="dellink" href="/Teacher/DeleteConfirm/@Model.TeacherId">Delete</a>
+    </nav>
+    <h2> @Model.TeacherFname @Model.TeacherLname </h2>
+    <p>
+        <div> Employee Number: @Model.EmployeeNumber </div>
+    </p>
+</div>

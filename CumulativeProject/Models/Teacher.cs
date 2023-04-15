@@ -11,8 +11,9 @@ namespace CumulativeProject.Models
         public int TeacherId;
         public string TeacherFname;
         public string TeacherLname;
-        public decimal Salary;
         public string EmployeeNumber;
+
+        public Teacher() { }
     
     }
 }

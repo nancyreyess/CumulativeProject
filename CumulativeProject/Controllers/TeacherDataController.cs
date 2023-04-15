@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using CumulativeProject.Models;
 using MySql.Data.MySqlClient;
+using System.Diagnostics;
 
 namespace CumulativeProject.Controllers
 {
@@ -36,9 +37,10 @@ namespace CumulativeProject.Controllers
             MySqlCommand cmd = Conn.CreateCommand();
 
             //SQL QUERY
-            cmd.CommandText = "Select * from Teachers where lower(teacherfname) like lower('%"+SearchKey+
-              "%') or lower(teacherlname) like lower('%"+SearchKey+
-              "%') or lower(concat(teacherfname, ' ', teacherlname)) like ('%"+SearchKey+"%')";
+            cmd.CommandText = "Select * from Teachers where lower(teacherfname) like lower(@key) or lower(teacherlname) like lower(@key) or lower(concat(teacherfname, ' ', teacherlname)) like lower(@key)";
+
+            cmd.Parameters.AddWithValue("@key", "%" + SearchKey + "%");
+            cmd.Prepare();
 
             //Gather Result Set of Query into a variable
             MySqlDataReader ResultSet = cmd.ExecuteReader();
@@ -53,14 +55,12 @@ namespace CumulativeProject.Controllers
                 int TeacherId = (int)ResultSet["teacherid"];
                 string TeacherFname = (string)ResultSet["teacherfname"];
                 string TeacherLname = (string)ResultSet["teacherlname"];
-                decimal Salary = (decimal)ResultSet["salary"];
-                string EmployeeNumber = (string)ResultSet["employeenumber"];
+                string EmployeeNumber = ResultSet["employeenumber"].ToString();
 
                 Teacher NewTeacher = new Teacher();
                 NewTeacher.TeacherId = TeacherId;
                 NewTeacher.TeacherFname= TeacherFname;
                 NewTeacher.TeacherLname= TeacherLname;
-                NewTeacher.Salary = Salary; 
                 NewTeacher.EmployeeNumber = EmployeeNumber; 
                 
                 //Add the Teacher Name to the List
@@ -89,7 +89,10 @@ namespace CumulativeProject.Controllers
             MySqlCommand cmd = Conn.CreateCommand();
 
             //SQL QUERY
-            cmd.CommandText = "Select * from Teachers where teacherid = " +id;
+            cmd.CommandText = "Select * from Teachers where teacherid = @id";
+
+            cmd.Parameters.AddWithValue("@id", id);
+            cmd.Prepare();
 
             //Gather Result Set of Query into a variable
             MySqlDataReader ResultSet = cmd.ExecuteReader();
@@ -100,17 +103,72 @@ namespace CumulativeProject.Controllers
                 int TeacherId = (int)ResultSet["teacherid"];
                 string TeacherFname = (string)ResultSet["teacherfname"];
                 string TeacherLname = (string)ResultSet["teacherlname"];
-                decimal Salary = (decimal)ResultSet["salary"];
-                string EmployeeNumber = (string)ResultSet["employeenumber"];
+                string EmployeeNumber = ResultSet["employeenumber"].ToString();
 
                 NewTeacher.TeacherId = TeacherId;
                 NewTeacher.TeacherFname = TeacherFname;
                 NewTeacher.TeacherLname = TeacherLname;
-                NewTeacher.Salary = Salary;
                 NewTeacher.EmployeeNumber = EmployeeNumber;
             }
+            Conn.Close();
 
             return NewTeacher;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <example> POST: /api/TeacherData/DeleteTeacher/3</example>
+
+        [HttpPost]
+        public void DeleteTeacher(int id)
+        {
+            //Create an instance of a connection
+            MySqlConnection Conn = School.AccessDatabase();
+
+            //Open the connection between the web server and database
+            Conn.Open();
+
+            //Establish a new command (query) for our database
+            MySqlCommand cmd = Conn.CreateCommand();
+
+            //SQL QUERY
+            cmd.CommandText = "Delete from teachers where teacherid=@id";
+
+            cmd.Parameters.AddWithValue("@id", id);
+            cmd.Prepare();
+
+            cmd.ExecuteNonQuery(); //NonQuery is a method that allows us to execute non SELECT(read) statements (insert, update, delete)
+
+            Conn.Close();
+
+        }
+
+        [HttpPost]
+        public void AddTeacher([FromBody] Teacher NewTeacher)
+        {
+            //Create an instance of a connection
+            MySqlConnection Conn = School.AccessDatabase();
+
+            //Open the connection between the web server and database
+            Conn.Open();
+
+            //Establish a new command (query) for our database
+            MySqlCommand cmd = Conn.CreateCommand();
+
+            //SQL QUERY
+            cmd.CommandText = "insert into teachers (teacherfname, teacherlname, employeenumber) values (@TeacherFname, @TeacherLname, @EmployeeNumber)";
+            cmd.Parameters.AddWithValue("@TeacherFname", NewTeacher.TeacherFname);
+            cmd.Parameters.AddWithValue("@TeacherLname", NewTeacher.TeacherLname);
+            cmd.Parameters.AddWithValue("@EmployeeNumber", NewTeacher.EmployeeNumber);
+            cmd.Prepare();
+
+            cmd.ExecuteNonQuery(); //NonQuery is a method that allows us to execute non SELECT(read) statements (insert, update, delete)
+
+            Conn.Close();
+
+
         }
 
     }
